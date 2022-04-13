@@ -12,6 +12,7 @@
         "tags": [
             "connection", "fast-path"
         ],
-        "supportLevel": "NOT_SUPPORTED"
+        "supportLevel": "NOT_SUPPORTED",
+        "selectableFromDataset": "main"
     }
 }

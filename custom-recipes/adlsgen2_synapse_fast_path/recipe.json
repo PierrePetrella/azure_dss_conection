@@ -5,8 +5,7 @@
         
         "label": "sync from blob storage to synapse",
         "description": "This recipe replaces the sync recipe between blob storage and synapse",
-        // icon: must be one of the FontAwesome 3.2.1 icons, complete list here at https://fontawesome.com/v3.2.1/icons/
-        "icon": "icon-expand"
+         "icon": "icon-expand"
     },
     "kind": "PYTHON",
     "inputRoles": [
@@ -28,9 +27,6 @@
             "required": true,
             "acceptsDataset": true
         }
-    ],
-
-    "params": [
     ],
     "resourceKeys": []
 }
