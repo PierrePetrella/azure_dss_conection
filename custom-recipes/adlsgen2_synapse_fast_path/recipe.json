@@ -1,0 +1,36 @@
+
+{
+    
+    "meta": {
+        
+        "label": "sync from blob storage to synapse",
+        "description": "This recipe replaces the sync recipe between blob storage and synapse",
+        // icon: must be one of the FontAwesome 3.2.1 icons, complete list here at https://fontawesome.com/v3.2.1/icons/
+        "icon": "icon-expand"
+    },
+    "kind": "PYTHON",
+    "inputRoles": [
+        {
+            "name": "input_dataset",
+            "label": "Input adlsgen2 dataset",
+            "description": "This connection must be a adlsgen2 (blob storage) dataset",
+            "arity": "UNARY",
+            "required": true,
+            "acceptsDataset": true
+        }
+    ],
+    "outputRoles": [
+        {
+            "name": "output_dataset",
+            "label": "synapse dataset",
+            "description": "This dataset should only be a synapse connection",
+            "arity": "UNARY",
+            "required": true,
+            "acceptsDataset": true
+        }
+    ],
+
+    "params": [
+    ],
+    "resourceKeys": []
+}
