@@ -80,7 +80,7 @@ print("")
 fp_query = drop_if_2 + query_copy
 
 print ("final_query:")
-print(final_query)
+print(fp_query)
 print("")
 
 # Execute the conditional drop and COPY IN command
