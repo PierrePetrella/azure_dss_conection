@@ -10,8 +10,7 @@ from dataiku import SQLExecutor2
 client = dataiku.api_client()
 
 # Get handle on in put dataset
-
-input_dataset_name = get_output_names_for_role('input_dataset')[0]
+input_dataset_name = get_input_names_for_role('input_dataset')[0]
 input_dataset = dataiku.Dataset(input_dataset_name)
 
 # Get handle on output dataset name to feed to the "COPY" query
@@ -19,22 +18,20 @@ output_dataset_name = get_output_names_for_role('output_dataset')[0]
 output_dataset = dataiku.Dataset(output_dataset_name)
 
 
-# Get input Connection Information & Dataset metadata information
+# Get input adlsgen2 Connection Information & Dataset metadata information
 in_config = input_dataset.get_config()
-connection = in_config["params"]["connection"]
-in_cnx = client.get_connection(connection)
-storage_account = in_cnx.get_info()["params"]["storageAccount"]
 path = in_config["params"]["path"]
 container = in_config["params"]["container"]
+in_cnx_name = in_config["params"]["connection"]
+in_cnx = client.get_connection(in_cnx_name)
+storage_account = in_cnx.get_info()["params"]["storageAccount"]
 file_name = "out-s0.csv"
 
 adlsgen2_file_url = "'https://" + storage_account + ".dfs.core.windows.net/" + container + path + file_name + "'"
 adlsgen2_file_url = adlsgen2_file_url.replace("${projectKey}",dataiku.default_project_key())
 print(adlsgen2_file_url)
 
-# Nothing is tested here...
-
-### Get input Connection Information & Dataset metadata information
+### Get output synapse Connection Information & Dataset metadata information
 # Get output dataset related information
 out_config = output_dataset.get_config()
 out_params = out_config["params"]
@@ -44,8 +41,8 @@ formated_out_table = out_table.replace("${projectKey}",dataiku.default_project_k
 formated_out_table_w_quote = '"' + formated_out_table +'"'
 
 # Get output connection related information
-input_cnx_name = input_dataset.get_config()["params"]["connection"]
-out_cnx = client.get_connection(input_cnx_name)
+out_cnx_name = output_dataset.get_config()["params"]["connection"]
+out_cnx = client.get_connection(out_cnx_name)
 out_database = out_cnx.get_definition()["params"]["db"]
 
 
@@ -69,7 +66,7 @@ print("drop_if_2")
 print(drop_if_2)
 print("")
 
-query_copy = "COPY INTO " + formated_out_table_w_quote + " FROM " + adlsgen2_file_url + """
+query_copy = " COPY INTO " + formated_out_table_w_quote + " FROM " + adlsgen2_file_url + """
     WITH (
         FILE_TYPE = 'CSV',
         FIELDQUOTE = '0x00',
@@ -80,14 +77,13 @@ print ("query_copy")
 print(query_copy)
 print("")
 
-final_query = drop_if_2 + query_copy
+fp_query = drop_if_2 + query_copy
 
 print ("final_query:")
 print(final_query)
 print("")
 
-# -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
 # Execute the conditional drop and COPY IN command
 executor = SQLExecutor2(dataset=output_dataset)
-executor.query_to_df(final_query)
+executor.query_to_df(fp_query)
 print("Done")
