@@ -8,6 +8,7 @@ from dataiku import SQLExecutor2
 
 
 client = dataiku.api_client()
+project = client.get_default_project()
 
 # Get handle on in put dataset
 input_dataset_name = get_input_names_for_role('input_dataset')[0]
