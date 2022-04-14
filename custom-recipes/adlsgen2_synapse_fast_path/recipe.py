@@ -3,6 +3,7 @@
 import dataiku
 import pandas as pd, numpy as np
 from dataiku import pandasutils as pdu
+from dataiku.customrecipe import *
 from dataiku import SQLExecutor2
 
 
@@ -28,7 +29,7 @@ container = in_config["params"]["container"]
 file_name = "out-s0.csv"
 
 adlsgen2_file_url = "'https://" + storage_account + ".dfs.core.windows.net/" + container + path + file_name + "'"
-adlsgen2_file_url = azure_url.replace("${projectKey}",dataiku.default_project_key())
+adlsgen2_file_url = adlsgen2_file_url.replace("${projectKey}",dataiku.default_project_key())
 print(adlsgen2_file_url)
 
 # Nothing is tested here...

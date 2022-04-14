@@ -2,9 +2,9 @@
     "id": "azure-dss-connection",
     "version": "0.1.0",
     "meta": {
-        "label": "DSS to Azure connection plugins",
+        "label": "DSS to Azure connection",
         "category": "connection",
-        "description": "DSS to Azure connection plugins",
+        "description": "This plugin temorarily replaces the sync between Azure Blob storage and Synapse",
         "author": "Dataiku (Pierre PETRELLA)",
         "icon": "icon-bolt",
         "licenseInfo": "Apache Software License",
@@ -13,6 +13,6 @@
             "connection", "fast-path"
         ],
         "supportLevel": "NOT_SUPPORTED",
-        "selectableFromDataset": "main"
+        "selectableFromDataset": "input_dataset"
     }
 }
