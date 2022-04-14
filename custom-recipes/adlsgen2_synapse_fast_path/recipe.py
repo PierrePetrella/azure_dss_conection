@@ -90,28 +90,32 @@ print("")
 #print("Done")
 
 # -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
-tmp_dataset = project.create_dataset("tmp_dataset_fp"  # dot is not allowed in dataset names
-        ,'Synapse'
-        , params={
-            'connection': out_connection
-        }, formatType='csv')
+#tmp_dataset = project.create_dataset("tmp_dataset_fp"  # dot is not allowed in dataset names
+#        ,'Synapse'
+#        , params={
+#            'connection': out_connection
+#        }, formatType='csv')
 
 # -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
-tmp_dataset_handle = dataiku.Dataset("tmp_dataset_fp", ignore_flow=True)
+#tmp_dataset_handle = dataiku.Dataset("tmp_dataset_fp")
 
 # -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
 # Get schema from inputand write in output
-schema = input_dataset.get_config()["schema"]["columns"]
-tmp_dataset_handle.write_schema(schema)
+#schema = input_dataset.get_config()["schema"]["columns"]
+#tmp_dataset_handle.write_schema(schema)
 
 # -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
 # Get df from input schema and write back 
-out_df = tmp_dataset_handle.get_dataframe()
-output_dataset.write_from_dataframe(out_df)
-out_df
+#out_df = tmp_dataset_handle.get_dataframe()
+#output_dataset.write_from_dataframe(out_df)
+#out_df
 
 # -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
-tmp_dataset.delete(drop_data=True)
+#tmp_dataset.delete(drop_data=True)
+generator = input_dataset.iter_dataframes(chunksize=1)
+df = next(generator)
+df_empty = df.drop(index = [0])
+output_dataset.write_from_dataframe(df_empty)
 
 # -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
 # QUERY COPY
