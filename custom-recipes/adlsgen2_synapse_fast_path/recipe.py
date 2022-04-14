@@ -47,24 +47,24 @@ out_database = out_cnx.get_definition()["params"]["db"]
 
 
 # Plain drop without check if table exists..
-drop_if_0 = "DROP TABLE " + formated_out_table_w_quote + " END; "
-print ("drop_if_0")
-print(drop_if_0)
-print("")
+#drop_if_0 = "DROP TABLE " + formated_out_table_w_quote + " END; "
+#print ("drop_if_0")
+#print(drop_if_0)
+#print("")
 
 # Search if an object exists in DSS and then drop the object hoping it is a table
-drop_if_1 = "IF OBJECT_ID(N'" + out_database +".." + formated_out_table + "') IS NOT NULL BEGIN DROP TABLE " + \
-        formated_out_table_w_quote + " END; "
-print ("drop_if_1")
-print(drop_if_1)
-print("")
+#drop_if_1 = "IF OBJECT_ID(N'" + out_database +".." + formated_out_table + "') IS NOT NULL BEGIN DROP TABLE " + \
+#        formated_out_table_w_quote + " END; "
+#print ("drop_if_1")
+#print(drop_if_1)
+#print("")
 
 # Search if a table exists in the default dbo database
-drop_if_2 = "IF EXISTS(SELECT [name] FROM sys.tables WHERE [name] like '" + formated_out_table + \
-           "%') BEGIN DROP TABLE " + formated_out_table_w_quote  + "; END; "
-print("drop_if_2")
-print(drop_if_2)
-print("")
+#drop_if_2 = "IF EXISTS(SELECT [name] FROM sys.tables WHERE [name] like '" + formated_out_table + \
+#           "%') BEGIN DROP TABLE " + formated_out_table_w_quote  + "; END; "
+#print("drop_if_2")
+#print(drop_if_2)
+#print("")
 
 query_copy = " COPY INTO " + formated_out_table_w_quote + " FROM " + adlsgen2_file_url + """
     WITH (
@@ -77,13 +77,25 @@ print ("query_copy")
 print(query_copy)
 print("")
 
-fp_query = drop_if_2 + query_copy
+#fp_query = drop_if_2 + query_copy
 
-print ("final_query:")
-print(fp_query)
-print("")
+#print ("final_query:")
+#print(fp_query)
+#print("")
 
 # Execute the conditional drop and COPY IN command
+#executor = SQLExecutor2(dataset=output_dataset)
+#executor.query_to_df(fp_query)
+#print("Done")
+
+# Get schema and add to output
+schema = input_dataset.get_config()["schema"]["columns"]
+output_dataset.write_schema(schema)
+
+# Get df from input schema and write back 
+out_df = output_dataset.get_dataframe()
+output_dataset.write_from_dataframe(out_df)
+
+# QUERY COPY
 executor = SQLExecutor2(dataset=output_dataset)
-executor.query_to_df(fp_query)
-print("Done")
+executor.query_to_df(query_copy)
