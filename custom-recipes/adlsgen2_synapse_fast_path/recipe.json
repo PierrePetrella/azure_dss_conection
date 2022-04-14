@@ -8,7 +8,7 @@
          "icon": "icon-expand"
     },
     "kind": "PYTHON",
-    "selectableFromDataset": "main",
+    "selectableFromDataset": "input_dataset",
     "inputRoles": [
         {
             "name": "input_dataset",
