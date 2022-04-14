@@ -88,14 +88,32 @@ print("")
 #executor.query_to_df(fp_query)
 #print("Done")
 
-# Get schema and add to output
+# -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
+tmp_dataset = project.create_dataset("tmp_dataset_fp"  # dot is not allowed in dataset names
+        ,'Synapse'
+        , params={
+            'connection': out_connection
+        }, formatType='csv')
+
+# -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
+tmp_dataset_handle = dataiku.Dataset("tmp_dataset_fp")
+
+# -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
+# Get schema from inputand write in output
 schema = input_dataset.get_config()["schema"]["columns"]
-output_dataset.write_schema(schema)
+tmp_dataset_handle.write_schema(schema)
 
+# -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
 # Get df from input schema and write back 
-out_df = output_dataset.get_dataframe()
+out_df = tmp_dataset_handle.get_dataframe()
 output_dataset.write_from_dataframe(out_df)
+out_df
 
+# -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
+tmp_dataset.delete(drop_data=True)
+
+# -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
 # QUERY COPY
 executor = SQLExecutor2(dataset=output_dataset)
 executor.query_to_df(query_copy)
+
