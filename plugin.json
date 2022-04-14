@@ -8,11 +8,10 @@
         "author": "Dataiku (Pierre PETRELLA)",
         "icon": "icon-bolt",
         "licenseInfo": "Apache Software License",
-        "url": "https://www.dataiku.com/product/plugins/your-plugin-id/",
+        "url": "https://www.dataiku.com/product/plugins/azure-dss-connection/",
         "tags": [
             "connection", "fast-path"
         ],
-        "supportLevel": "NOT_SUPPORTED",
-        "selectableFromDataset": "input_dataset"
+        "supportLevel": "NOT_SUPPORTED"
     }
 }
