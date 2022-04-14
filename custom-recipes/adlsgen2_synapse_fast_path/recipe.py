@@ -97,7 +97,7 @@ tmp_dataset = project.create_dataset("tmp_dataset_fp"  # dot is not allowed in d
         }, formatType='csv')
 
 # -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
-tmp_dataset_handle = dataiku.Dataset("tmp_dataset_fp")
+tmp_dataset_handle = dataiku.Dataset("tmp_dataset_fp", ignore_flow=True)
 
 # -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
 # Get schema from inputand write in output
