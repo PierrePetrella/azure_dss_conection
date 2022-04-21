@@ -49,7 +49,7 @@ out_database = out_cnx.get_definition()["params"]["db"]
 
 
 input_format_type = input_dataset.get_config()["formatType"]
-if input_format_type == 'csv':
+if input_format_type != 'csv':
     logging.error("the input format type must be CSV, not " +input_format_type)
 
 # Plain drop without check if table exists..
