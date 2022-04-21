@@ -26,7 +26,7 @@ container = in_config["params"]["container"]
 in_cnx_name = in_config["params"]["connection"]
 in_cnx = client.get_connection(in_cnx_name)
 storage_account = in_cnx.get_info()["params"]["storageAccount"]
-file_name = "out-s0.csv"
+file_name = "/out-s0.csv"
 
 adlsgen2_file_url = "'https://" + storage_account + ".dfs.core.windows.net/" + container + path + file_name + "'"
 adlsgen2_file_url = adlsgen2_file_url.replace("${projectKey}",dataiku.default_project_key())
