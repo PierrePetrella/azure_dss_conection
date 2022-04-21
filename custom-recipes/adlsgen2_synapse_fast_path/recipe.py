@@ -5,12 +5,12 @@ import pandas as pd, numpy as np
 from dataiku import pandasutils as pdu
 from dataiku.customrecipe import *
 from dataiku import SQLExecutor2
-import logging
 
 
 client = dataiku.api_client()
 project = client.get_default_project()
 
+### Get handles in INPUT and OUTPUT
 # Get handle on input dataset
 input_dataset_name = get_input_names_for_role('input_dataset')[0]
 input_dataset = dataiku.Dataset(input_dataset_name)
@@ -20,7 +20,7 @@ output_dataset_name = get_output_names_for_role('output_dataset')[0]
 output_dataset = dataiku.Dataset(output_dataset_name)
 
 
-# Get input adlsgen2 Connection Information & Dataset metadata information
+### Get input adlsgen2 Connection Information & Dataset metadata information
 in_config = input_dataset.get_config()
 path = in_config["params"]["path"]
 container = in_config["params"]["container"]
@@ -48,34 +48,25 @@ out_cnx = client.get_connection(out_cnx_name)
 out_database = out_cnx.get_definition()["params"]["db"]
 
 
+### CHECKS INPUT and OUTPUT respect the requirments
+
+# Check input connection is adlsgen2
+input_cnx_type = in_cnx.get_info()["type"]
+if input_cnx_type != 'Azure':
+    raise Exception("The input format type must be Azure, not " +input_cnx_type)
+
+# Check input is stored as CSV
 input_format_type = input_dataset.get_config()["formatType"]
 if input_format_type != 'csv':
     #logging.error("the input format type must be CSV, not " +input_format_type)
-    raise Exception("the input format type must be CSV, not " +input_format_type)
+    raise Exception("The input format type must be CSV, not " +input_format_type)
 
-# Plain drop without check if table exists..
-#drop_if_0 = "DROP TABLE " + formated_out_table_w_quote + " END; "
-#print ("drop_if_0")
-#print(drop_if_0)
-#print("")
+# Check output connection is synapse
+output_cnx_type = out_cnx.get_info()["type"]
+if output_cnx_type != 'Synapse':
+    raise Exception("The output connection must be Synapse, not " +output_cnx_type)
 
-# Search if an object exists in DSS and then drop the object hoping it is a table
-#drop_if_1 = "IF OBJECT_ID(N'" + out_database +".." + formated_out_table + "') IS NOT NULL BEGIN DROP TABLE " + \
-#        formated_out_table_w_quote + " END; "
-#print ("drop_if_1")
-#print(drop_if_1)
-#print("")
-
-# Search if a table exists in the default dbo database
-#drop_if_2 = "IF EXISTS(SELECT [name] FROM sys.tables WHERE [name] like '" + formated_out_table + \
-#           "%') BEGIN DROP TABLE " + formated_out_table_w_quote  + "; END; "
-#print("drop_if_2")
-#print(drop_if_2)
-#print("")
-
-
-
-
+### Build COPY INTO query (CSV only)
 query_copy = " COPY INTO " + formated_out_table_w_quote + " FROM " + adlsgen2_file_url + """
     WITH (
         FILE_TYPE = 'CSV',
@@ -87,47 +78,13 @@ print ("query_copy")
 print(query_copy)
 print("")
 
-#fp_query = drop_if_2 + query_copy
-
-#print ("final_query:")
-#print(fp_query)
-#print("")
-
-# Execute the conditional drop and COPY IN command
-#executor = SQLExecutor2(dataset=output_dataset)
-#executor.query_to_df(fp_query)
-#print("Done")
-
-# -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
-#tmp_dataset = project.create_dataset("tmp_dataset_fp"  # dot is not allowed in dataset names
-#        ,'Synapse'
-#        , params={
-#            'connection': out_connection
-#        }, formatType='csv')
-
-# -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
-#tmp_dataset_handle = dataiku.Dataset("tmp_dataset_fp")
-
-# -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
-# Get schema from inputand write in output
-#schema = input_dataset.get_config()["schema"]["columns"]
-#tmp_dataset_handle.write_schema(schema)
-
-# -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
-# Get df from input schema and write back 
-#out_df = tmp_dataset_handle.get_dataframe()
-#output_dataset.write_from_dataframe(out_df)
-#out_df
-
-# -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
-#tmp_dataset.delete(drop_data=True)
+### Fetch schema from input and create empty table with schema in output
 generator = input_dataset.iter_dataframes(chunksize=1)
 df = next(generator)
 df_empty = df.drop(index = [0])
 output_dataset.write_from_dataframe(df_empty)
 
-# -------------------------------------------------------------------------------- NOTEBOOK-CELL: CODE
-# QUERY COPY
+### QUERY COPY
 executor = SQLExecutor2(dataset=output_dataset)
 executor.query_to_df(query_copy)
 

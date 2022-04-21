@@ -3,8 +3,8 @@
     
     "meta": {
         
-        "label": "sync from blob storage to synapse",
-        "description": "This recipe replaces the sync recipe between blob storage and synapse",
+        "label": "Sync from Azure Blob Storage (CSV only) to Synapse",
+        "description": "This recipe replaces the sync recipe between Azure Blob Storage (CSV only) and Synapse",
          "icon": "icon-expand"
     },
     "kind": "PYTHON",
@@ -12,8 +12,8 @@
     "inputRoles": [
         {
             "name": "input_dataset",
-            "label": "Input adlsgen2 dataset",
-            "description": "This connection must be a adlsgen2 (blob storage) dataset",
+            "label": "Input adlsgen2 dataset (CSV only)",
+            "description": "This connection must be a adlsgen2 (Azure Blob Storage) dataset stored as a CSV only",
             "arity": "UNARY",
             "required": true,
             "acceptsDataset": true
