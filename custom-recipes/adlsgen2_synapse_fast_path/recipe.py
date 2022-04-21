@@ -5,12 +5,13 @@ import pandas as pd, numpy as np
 from dataiku import pandasutils as pdu
 from dataiku.customrecipe import *
 from dataiku import SQLExecutor2
+import logging
 
 
 client = dataiku.api_client()
 project = client.get_default_project()
 
-# Get handle on in put dataset
+# Get handle on input dataset
 input_dataset_name = get_input_names_for_role('input_dataset')[0]
 input_dataset = dataiku.Dataset(input_dataset_name)
 
@@ -47,6 +48,10 @@ out_cnx = client.get_connection(out_cnx_name)
 out_database = out_cnx.get_definition()["params"]["db"]
 
 
+input_format_type = input_dataset.get_config()["formatType"]
+if input_format_type == 'csv':
+    logging.error("the input format type must be CSV, not " +input_format_type)
+
 # Plain drop without check if table exists..
 #drop_if_0 = "DROP TABLE " + formated_out_table_w_quote + " END; "
 #print ("drop_if_0")
@@ -66,6 +71,9 @@ out_database = out_cnx.get_definition()["params"]["db"]
 #print("drop_if_2")
 #print(drop_if_2)
 #print("")
+
+
+
 
 query_copy = " COPY INTO " + formated_out_table_w_quote + " FROM " + adlsgen2_file_url + """
     WITH (
