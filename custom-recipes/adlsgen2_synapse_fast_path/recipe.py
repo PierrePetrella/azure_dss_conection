@@ -49,7 +49,6 @@ adlsgen2_file_url = adlsgen2_file_url.replace("${projectKey}",dataiku.default_pr
 ### Get Output Connection Information
 out_cnx_name = output_dataset.get_config()["params"]["connection"]
 out_cnx = client.get_connection(out_cnx_name)
-out_database = out_cnx.get_definition()["params"]["db"]
 
 # CHECK output connection is Synapse
 output_cnx_type = out_cnx.get_info()["type"]
@@ -57,6 +56,7 @@ if output_cnx_type != 'Synapse':
     raise Exception("The output connection must be Synapse, not " +output_cnx_type)
 
 ### Get Output Dataset Metadata Information
+out_database = out_cnx.get_definition()["params"]["db"]
 out_config = output_dataset.get_config()
 out_params = out_config["params"]
 out_connection = out_config["params"]["connection"]
