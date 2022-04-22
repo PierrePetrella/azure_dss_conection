@@ -20,14 +20,21 @@ output_dataset_name = get_output_names_for_role('output_dataset')[0]
 output_dataset = dataiku.Dataset(output_dataset_name)
 
 
+### CHECK INPUT / OUTPUT Connection Types
+# Check input connection type is Azure (adlsgen2)
+input_cnx_type = input_dataset.get_config()["type"]
+if input_cnx_type != 'Azure':
+    raise Exception("The input connection must be Azure, not " +input_cnx_type)
+
+# CHECK output connection is Synapse
+output_cnx_type = output_dataset.get_config()["type"]
+if output_cnx_type != 'Synapse':
+    raise Exception("The output connection must be Synapse, not " +output_cnx_type)
+
+
 ### Get Input Connection Information
 in_cnx_name = input_dataset.get_config()["params"]["connection"]
 in_cnx = client.get_connection(in_cnx_name)
-
-# CHECK input connection is adlsgen2
-input_cnx_type = in_cnx.get_info()["type"]
-if input_cnx_type != 'Azure':
-    raise Exception("The input connection must be Azure, not " +input_cnx_type)
 
 # CHECK input is stored as CSV (metastore)
 input_format_type = input_dataset.get_config().get("formatParams", {}).get("style", None)
@@ -49,11 +56,6 @@ adlsgen2_file_url = adlsgen2_file_url.replace("${projectKey}",dataiku.default_pr
 ### Get Output Connection Information
 out_cnx_name = output_dataset.get_config()["params"]["connection"]
 out_cnx = client.get_connection(out_cnx_name)
-
-# CHECK output connection is Synapse
-output_cnx_type = out_cnx.get_info()["type"]
-if output_cnx_type != 'Synapse':
-    raise Exception("The output connection must be Synapse, not " +output_cnx_type)
 
 ### Get Output Dataset Metadata Information
 out_database = out_cnx.get_definition()["params"]["db"]
