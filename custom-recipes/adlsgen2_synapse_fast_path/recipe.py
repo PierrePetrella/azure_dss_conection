@@ -77,7 +77,14 @@ query_copy = " COPY INTO " + formated_out_table_w_quote + " FROM " + adlsgen2_fi
 print (query_copy) # TO REMOVE
 
 
-### Fetch schema from input and create empty table with schema in output
+### Write Input dataset schema in output dataset schema
+input_schema = input_dataset.get_config()["schema"]
+print (input_schema)
+output_dataset.write_schema(input_schema["columns"])
+
+
+
+### Create empty table in output dataset with correct schema
 generator = input_dataset.iter_dataframes(chunksize=1)
 df = next(generator)
 df_empty = df.drop(index = [0])
