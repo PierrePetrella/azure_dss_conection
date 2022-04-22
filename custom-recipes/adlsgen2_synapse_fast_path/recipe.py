@@ -27,7 +27,7 @@ in_cnx = client.get_connection(in_cnx_name)
 # CHECK input connection is adlsgen2
 input_cnx_type = in_cnx.get_info()["type"]
 if input_cnx_type != 'Azure':
-    raise Exception("The input format type must be Azure, not " +input_cnx_type)
+    raise Exception("The input connection must be Azure, not " +input_cnx_type)
 
 # CHECK input is stored as CSV (metastore)
 input_format_type = input_dataset.get_config().get("formatParams", {}).get("style", None)
