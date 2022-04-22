@@ -10,7 +10,7 @@ from dataiku import SQLExecutor2
 client = dataiku.api_client()
 project = client.get_default_project()
 
-### Get handles in INPUT and OUTPUT
+### Get handles in INPUT and OUTPUT 
 # Get handle on input dataset
 input_dataset_name = get_input_names_for_role('input_dataset')[0]
 input_dataset = dataiku.Dataset(input_dataset_name)
@@ -20,21 +20,43 @@ output_dataset_name = get_output_names_for_role('output_dataset')[0]
 output_dataset = dataiku.Dataset(output_dataset_name)
 
 
-### Get input adlsgen2 Connection Information & Dataset metadata information
+### Get Input Connection Information
+in_cnx_name = input_dataset.get_config()["params"]["connection"]
+in_cnx = client.get_connection(in_cnx_name)
+
+# CHECK input connection is adlsgen2
+input_cnx_type = in_cnx.get_info()["type"]
+if input_cnx_type != 'Azure':
+    raise Exception("The input format type must be Azure, not " +input_cnx_type)
+
+# CHECK input is stored as CSV (metastore)
+input_format_type = input_dataset.get_config().get("formatParams", {}).get("style", None)
+if input_format_type != 'escape_only_no_quote':
+    raise Exception("The input format type must be CSV(Metastore)")
+
+
+### Get Input Dataset Metadata Information
 in_config = input_dataset.get_config()
 path = in_config["params"]["path"]
 container = in_config["params"]["container"]
-in_cnx_name = in_config["params"]["connection"]
-in_cnx = client.get_connection(in_cnx_name)
 storage_account = in_cnx.get_info()["params"]["storageAccount"]
 file_name = "/out-s0.csv"
-
+# Generate adlsgen2 url
 adlsgen2_file_url = "'https://" + storage_account + ".dfs.core.windows.net/" + container + path + file_name + "'"
 adlsgen2_file_url = adlsgen2_file_url.replace("${projectKey}",dataiku.default_project_key())
-print (adlsgen2_file_url) # TO REMOVE
 
-### Get output synapse Connection Information & Dataset metadata information
-# Get output dataset related information
+
+### Get Output Connection Information
+out_cnx_name = output_dataset.get_config()["params"]["connection"]
+out_cnx = client.get_connection(out_cnx_name)
+out_database = out_cnx.get_definition()["params"]["db"]
+
+# CHECK output connection is Synapse
+output_cnx_type = out_cnx.get_info()["type"]
+if output_cnx_type != 'Synapse':
+    raise Exception("The output connection must be Synapse, not " +output_cnx_type)
+
+### Get Output Dataset Metadata Information
 out_config = output_dataset.get_config()
 out_params = out_config["params"]
 out_connection = out_config["params"]["connection"]
@@ -42,28 +64,6 @@ out_table = out_params["table"]
 formated_out_table = out_table.replace("${projectKey}",dataiku.default_project_key())
 formated_out_table_w_quote = '"' + formated_out_table +'"'
 
-# Get output connection related information
-out_cnx_name = output_dataset.get_config()["params"]["connection"]
-out_cnx = client.get_connection(out_cnx_name)
-out_database = out_cnx.get_definition()["params"]["db"]
-
-
-### CHECKS INPUT and OUTPUT respect the requirments
-
-# Check input connection is adlsgen2
-input_cnx_type = in_cnx.get_info()["type"]
-if input_cnx_type != 'Azure':
-    raise Exception("The input format type must be Azure, not " +input_cnx_type)
-
-# Check input is stored as CSV
-input_format_type = input_dataset.get_config()["formatType"]
-if input_format_type != 'csv':
-    raise Exception("The input format type must be CSV, not " +input_format_type)
-
-# Check output connection is synapse
-output_cnx_type = out_cnx.get_info()["type"]
-if output_cnx_type != 'Synapse':
-    raise Exception("The output connection must be Synapse, not " +output_cnx_type)
 
 ### Build COPY INTO query (CSV only)
 query_copy = " COPY INTO " + formated_out_table_w_quote + " FROM " + adlsgen2_file_url + """
@@ -74,22 +74,16 @@ query_copy = " COPY INTO " + formated_out_table_w_quote + " FROM " + adlsgen2_fi
         FIELDTERMINATOR='\\t'
     )"""
 
-print (query_copy) # TO REMOVE
-
 
 ### Write Input dataset schema in output dataset schema
 input_schema = input_dataset.get_config()["schema"]
-print (input_schema)
 output_dataset.write_schema(input_schema["columns"])
-
-
 
 ### Create empty table in output dataset with correct schema
 generator = input_dataset.iter_dataframes(chunksize=1)
 df = next(generator)
 df_empty = df.drop(index = [0])
 output_dataset.write_from_dataframe(df_empty)
-
 
 ### QUERY COPY
 executor = SQLExecutor2(dataset=output_dataset)
