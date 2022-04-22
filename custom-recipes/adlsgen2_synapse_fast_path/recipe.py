@@ -31,7 +31,7 @@ file_name = "/out-s0.csv"
 
 adlsgen2_file_url = "'https://" + storage_account + ".dfs.core.windows.net/" + container + path + file_name + "'"
 adlsgen2_file_url = adlsgen2_file_url.replace("${projectKey}",dataiku.default_project_key())
-
+print (adlsgen2_file_url) # TO REMOVE
 
 ### Get output synapse Connection Information & Dataset metadata information
 # Get output dataset related information
@@ -58,7 +58,6 @@ if input_cnx_type != 'Azure':
 # Check input is stored as CSV
 input_format_type = input_dataset.get_config()["formatType"]
 if input_format_type != 'csv':
-    #logging.error("the input format type must be CSV, not " +input_format_type)
     raise Exception("The input format type must be CSV, not " +input_format_type)
 
 # Check output connection is synapse
@@ -75,11 +74,15 @@ query_copy = " COPY INTO " + formated_out_table_w_quote + " FROM " + adlsgen2_fi
         FIELDTERMINATOR='\\t'
     )"""
 
+print (query_copy) # TO REMOVE
+
+
 ### Fetch schema from input and create empty table with schema in output
 generator = input_dataset.iter_dataframes(chunksize=1)
 df = next(generator)
 df_empty = df.drop(index = [0])
 output_dataset.write_from_dataframe(df_empty)
+
 
 ### QUERY COPY
 executor = SQLExecutor2(dataset=output_dataset)
