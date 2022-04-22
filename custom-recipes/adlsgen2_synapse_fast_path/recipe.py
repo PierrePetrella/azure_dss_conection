@@ -31,7 +31,7 @@ file_name = "/out-s0.csv"
 
 adlsgen2_file_url = "'https://" + storage_account + ".dfs.core.windows.net/" + container + path + file_name + "'"
 adlsgen2_file_url = adlsgen2_file_url.replace("${projectKey}",dataiku.default_project_key())
-print(adlsgen2_file_url)
+
 
 ### Get output synapse Connection Information & Dataset metadata information
 # Get output dataset related information
@@ -74,9 +74,6 @@ query_copy = " COPY INTO " + formated_out_table_w_quote + " FROM " + adlsgen2_fi
         COMPRESSION = 'NONE',
         FIELDTERMINATOR='\\t'
     )"""
-print ("query_copy")
-print(query_copy)
-print("")
 
 ### Fetch schema from input and create empty table with schema in output
 generator = input_dataset.iter_dataframes(chunksize=1)
