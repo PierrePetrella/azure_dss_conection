@@ -58,7 +58,7 @@ out_cnx_name = output_dataset.get_config()["params"]["connection"]
 out_cnx = client.get_connection(out_cnx_name)
 
 ### Get Output Dataset Metadata Information
-out_database = out_cnx.get_definition()["params"]["db"]
+out_database = out_cnx.get_info().get("params").get("db")
 out_config = output_dataset.get_config()
 out_params = out_config["params"]
 out_connection = out_config["params"]["connection"]
