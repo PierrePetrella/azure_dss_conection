@@ -1,6 +1,6 @@
 {
     "id": "azure-dss-connection",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "meta": {
         "label": "DSS to Azure connection",
         "category": "connection",
